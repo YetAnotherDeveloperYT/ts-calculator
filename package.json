@@ -1,0 +1,17 @@
+{
+  "name": "calculator",
+  "private": "true",
+  "version": "0.0.1",
+  "description": "A Simple Calculator made in typescript",
+  "scripts": {
+    "dev": "vite src",
+    "build": "vite build src --emptyOutDir --outDir ../dist",
+    "preview": "vite preview src",
+    "serve": "npm run build && vite preview src"
+  },
+  "author": "YetAnotherDeveloperYT",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^2.9.11"
+  }
+}
