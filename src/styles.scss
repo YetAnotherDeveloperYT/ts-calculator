@@ -1,0 +1,120 @@
+//#region variables
+/* =============== Variables =============== */
+/* =============== Sizes =============== */
+$display-size: 35%;
+
+/* =============== Backgrounds =============== */
+$container-bg: #fefefe;
+$calculator-bg: #374352;
+$display-bg: #3a4655;
+$num-pad-bg: #3d4856;
+$num-pad-btn-bg: #374352;
+$num-pad-btn-active-bg: #323c49;
+
+/* =============== Text Colors =============== */
+$output-color: #fff;
+$preview-color: #8f8f8f;
+$num-pad-btn-color: #fff;
+$num-pad-btn-special-color: #fa980b;
+//#endregion
+
+
+/* =============== Global Styles =============== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Montserrat, sans-serif;
+  font-weight: 500;
+}
+
+/* =============== No Script =============== */
+.no-script {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: large;
+}
+
+.container {
+  width: min(100vw, 600px);
+  height: 100vh;
+  background: $container-bg;
+  margin: 0 auto;
+}
+
+.calculator {
+  width: 100%;
+  height: 100%;
+  background: $calculator-bg;
+}
+
+.calculator .displayHolder {
+  height: $display-size;
+  color: $output-color;
+  width: 100%;
+  background: $display-bg;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  font-size: 6vh;
+  display: flex;
+}
+
+.calculator .displayHolder .display {
+  scrollbar-width: 0;
+  scroll-behavior: smooth;
+  margin-right: 0.5rem;
+  padding-right: 0.25rem;
+  overflow: auto;
+}
+
+.calculator .displayHolder .display::-webkit-scrollbar {
+  display: none;
+}
+
+.calculator .displayHolder .preview {
+  color: $preview-color;
+  scrollbar-width: 0;
+  scroll-behavior: smooth;
+  margin-right: 0.5rem;
+  padding-right: 0.25rem;
+  overflow: auto;
+}
+
+.calculator .displayHolder .preview::-webkit-scrollbar {
+  display: none;
+}
+
+.calculator .num-pad {
+  height: 100% - $display-size;
+  width: 100%;
+  background: $num-pad-bg;
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  display: grid;
+}
+
+.calculator .num-pad button {
+  border: unset;
+  color: $num-pad-btn-color;
+  cursor: pointer;
+  user-select: none;
+  background: $num-pad-btn-bg;
+  font-size: 4vh;
+}
+
+.calculator .num-pad button svg {
+  height: 4vh;
+}
+
+.calculator .num-pad button:active {
+  background: $num-pad-btn-active-bg;
+}
+
+.calculator .num-pad button.special {
+  color: $num-pad-btn-special-color;
+}

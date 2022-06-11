@@ -1,4 +1,17 @@
-const clearIcon = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 44.18 44.18" style="enable-background: new 0 0 44.18 44.18" fill="currentColor"><g><path d="M10.625,5.09L0,22.09l10.625,17H44.18v-34H10.625z M42.18,37.09H11.734l-9.375-15l9.375-15H42.18V37.09z"/><polygon points="18.887,30.797 26.18,23.504 33.473,30.797 34.887,29.383 27.594,22.09 34.887,14.797 33.473,13.383 26.18,20.676 18.887,13.383 17.473,14.797 24.766,22.09 17.473,29.383"/></g></svg>`;
+document.addEventListener("DOMContentLoaded", () => {
+  if ("serviceWorker" in navigator) {
+    try {
+      navigator.serviceWorker
+        .register("/serviceWorker.js", { scope: "/" })
+        .then(() => {});
+    } catch (e) {
+      console.log("Service Worker Registration Failed");
+      console.log(e);
+    }
+  }
+});
+
+const clearIcon = `<svg x="0px" y="0px" viewBox="0 0 44.18 44.18" fill="currentColor"><path d="M10.625,5.09L0,22.09l10.625,17H44.18v-34H10.625z M42.18,37.09H11.734l-9.375-15l9.375-15H42.18V37.09z"/><polygon points="18.887,30.797 26.18,23.504 33.473,30.797 34.887,29.383 27.594,22.09 34.887,14.797 33.473,13.383 26.18,20.676 18.887,13.383 17.473,14.797 24.766,22.09 17.473,29.383"/></svg>`;
 
 const specialBtn = [0, 1, 2, 3, 19];
 const numpadMap: { value: string; exec: any }[] = [
@@ -27,6 +40,7 @@ const numpadMap: { value: string; exec: any }[] = [
 let expression = "0";
 let bracketsOpened = 0;
 let hasDecimal = false;
+let isResulted = false;
 let displayElement: HTMLParagraphElement;
 let previewElement: HTMLParagraphElement;
 const operators = ["+", "-", "*", "/"];
@@ -39,7 +53,6 @@ function init(element: HTMLElement) {
   updateDisplay();
 }
 
-// TODO: Setup Preview
 function initCalculator(rootElement: HTMLElement) {
   const displayHolderElement = document.createElement("div");
   displayHolderElement.classList.add("displayHolder");
@@ -49,7 +62,7 @@ function initCalculator(rootElement: HTMLElement) {
   previewElement.classList.add("preview");
   displayHolderElement.append(displayElement, previewElement);
   const numPadElement = document.createElement("div");
-  numPadElement.classList.add("numpad");
+  numPadElement.classList.add("num-pad");
   rootElement.append(displayHolderElement, numPadElement);
   createNumpad(numPadElement);
 }
@@ -57,6 +70,7 @@ function initCalculator(rootElement: HTMLElement) {
 function createNumpad(numPadElement: HTMLDivElement) {
   numpadMap.forEach((num, i) => {
     const btn = document.createElement("button");
+    if (i === 1) btn.ariaLabel = "Clear";
     btn.innerHTML = num.value;
     if (specialBtn.includes(i)) {
       btn.classList.add("special");
@@ -64,6 +78,7 @@ function createNumpad(numPadElement: HTMLDivElement) {
     btn.addEventListener("click", () => {
       num.exec(num.value);
       updateDisplay();
+      getPreview();
     });
     numPadElement.append(btn);
   });
@@ -72,9 +87,15 @@ function createNumpad(numPadElement: HTMLDivElement) {
 function clearAll() {
   expression = "0";
   bracketsOpened = 0;
+  isResulted = false;
 }
 
 function clearOne() {
+  if (isResulted) {
+    clearAll();
+    isResulted = false;
+    return;
+  }
   switch (getLastToken()) {
     case "(":
       bracketsOpened--;
@@ -93,6 +114,11 @@ function clearOne() {
 
 function openBracket() {
   const lastToken = getLastToken();
+  if (isResulted) {
+    expression = "(";
+    isResulted = false;
+    return;
+  }
   if (lastToken === ".") {
     return;
   }
@@ -122,6 +148,7 @@ function openBracket() {
 
 function closeBracket() {
   const lastToken = getLastToken();
+  if (isResulted) return;
   if (lastToken === ".") return;
   if (lastToken === "(") return;
   if (operators.includes(lastToken)) return;
@@ -135,6 +162,9 @@ function closeBracket() {
 
 function useOperator(operator: string) {
   const lastToken = getLastToken();
+  if (isResulted) {
+    isResulted = false;
+  }
   if (lastToken === ".") return;
   if (operators.includes(lastToken)) return;
   expression += operator;
@@ -144,6 +174,10 @@ function useOperator(operator: string) {
 
 function useDecimalPoint() {
   const lastToken = getLastToken();
+  if (isResulted) {
+    expression = "0";
+    isResulted = false;
+  }
   if (hasDecimal) return;
   if (lastToken === ".") return;
   if (lastToken === "(") {
@@ -163,6 +197,10 @@ function useDecimalPoint() {
 
 function addNumber(number: string) {
   const lastToken = getLastToken();
+  if (isResulted) {
+    expression = "0";
+    isResulted = false;
+  }
   if (expression === "0") {
     expression = number;
     return;
@@ -176,7 +214,7 @@ function addNumber(number: string) {
 
 function evaluateExpression() {
   const lastToken = getLastToken();
-  if (lastToken === "(" || lastToken === ")") return;
+  if (lastToken === "(") return;
   if (bracketsOpened > 0) {
     while (bracketsOpened--) {
       expression += ")";
@@ -187,6 +225,21 @@ function evaluateExpression() {
     expression = formatNumber(Number(expFunction()));
   } catch (e) {
     expression = "Error";
+  }
+  isResulted = true;
+}
+
+function getPreview() {
+  if (isResulted) {
+    previewElement.innerText = "";
+    return;
+  }
+  try {
+    previewElement.innerText = formatNumber(
+      Number(new Function("return " + expression)())
+    );
+  } catch (e) {
+    previewElement.innerText = "";
   }
 }
 

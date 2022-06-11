@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "vite src",
     "build": "vite build src --emptyOutDir --outDir ../dist",
-    "preview": "vite preview src",
-    "serve": "npm run build && vite preview src"
+    "preview": "vite preview",
+    "serve": "npm run build && clear && vite preview"
   },
   "author": "YetAnotherDeveloperYT",
   "license": "MIT",
   "devDependencies": {
+    "sass": "^1.52.3",
     "vite": "^2.9.11"
   }
 }

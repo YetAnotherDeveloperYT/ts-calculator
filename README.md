@@ -67,10 +67,10 @@ yarn serve
 - [x] Checks for using brackets
 - [x] Checks for using operators
 - [x] Checks for using decimal point
-- [ ] Preview Results
+- [x] Preview Results
 - [ ] Calculation History
 - [ ] Improve UI
-- [ ] Convert to PWA
+- [x] Convert to PWA
 - [ ] Add New Functions like power, log, trigonometric functions.
 
 ## Contributing
